@@ -1,6 +1,7 @@
 # Importing Dependencies
+
 import pytest
-from align import NeedlemanWunsch, read_fasta
+from align.align import NeedlemanWunsch, read_fasta
 import numpy as np
 
 def test_nw_alignment():
@@ -14,8 +15,12 @@ def test_nw_alignment():
     """
     seq1, _ = read_fasta("./data/test_seq1.fa")
     seq2, _ = read_fasta("./data/test_seq2.fa")
-    pass
-    
+
+    a = NeedlemanWunsch(sub_matrix_file='substitution_matrices/BLOSUM62.mat',gap_open=-10, gap_extend=-1)
+
+    score, seq1_align, seq2_align = a.align(seq1, seq2)
+
+    assert (a._align_matrix == np.array([[0., -10., -11., -12., -13.], [-10., 5., -11., -11., -13.], [-11., -10., 4., -1., -6.], [-12., -12., -8., 5., 4.]])).all(), "Align matrix is incorrect"
 
 def test_nw_backtrace():
     """
@@ -27,8 +32,12 @@ def test_nw_backtrace():
     """
     seq3, _ = read_fasta("./data/test_seq3.fa")
     seq4, _ = read_fasta("./data/test_seq4.fa")
-    pass
 
+    a = NeedlemanWunsch(sub_matrix_file='substitution_matrices/BLOSUM62.mat',gap_open=-10, gap_extend=-1)
+    score, seq3_align, seq4_align = a.align(seq3, seq4)
 
+    assert seq3_align == "MAVHQLIRRP", "Aligned sequence 3 is incorrect"
+    assert seq4_align == "M---QLIRHP", "Aligned sequence 4 is incorrect"
 
-
+    # score is 17 (from README)
+    assert score == 17, f"Score is incorrect {score}"
